@@ -1,0 +1,4 @@
+flask
+werkzeug
+boto3
+gunicorn
