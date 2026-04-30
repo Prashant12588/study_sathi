@@ -1,0 +1,49 @@
+name: Deploy Study Sathi
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1
+
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 716200068598.dkr.ecr.ap-south-1.amazonaws.com
+
+    - name: Build and push Docker image
+      run: |
+        docker build -t study-sathi .
+        docker tag study-sathi:latest 716200068598.dkr.ecr.ap-south-1.amazonaws.com/study-sathi:latest
+        docker push 716200068598.dkr.ecr.ap-south-1.amazonaws.com/study-sathi:latest
+
+    - name: Deploy to EC2
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ubuntu
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 716200068598.dkr.ecr.ap-south-1.amazonaws.com
+          docker pull 716200068598.dkr.ecr.ap-south-1.amazonaws.com/study-sathi:latest
+          docker stop study-sathi-app || true
+          docker rm study-sathi-app || true
+          docker run -d \
+            --name study-sathi-app \
+            -p 5000:5000 \
+            -e AWS_REGION="ap-south-1" \
+            -e S3_BUCKET="study-sathi-notes" \
+            716200068598.dkr.ecr.ap-south-1.amazonaws.com/study-sathi:latest
