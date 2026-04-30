@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Study Sathi{% endblock %}
+{% block content %}
+<div class="flex jc-sb mb">
+  <div><h1>Dashboard</h1><p class="muted">Your study groups and activity</p></div>
+  <a href="{{ url_for('create_group') }}" class="btn btn-primary">+ New Group</a>
+</div>
+
+<h2 class="mb" style="font-size:1.1rem;color:var(--muted);">MY GROUPS</h2>
+{% if my_groups %}
+<div class="grid-3 mb">
+  {% for g in my_groups %}
+  <a href="{{ url_for('group_detail', group_id=g.id) }}" style="color:inherit;">
+    <div class="card">
+      <span class="badge" style="margin-bottom:12px;">{{ g.subject }}</span>
+      <h3 style="margin-bottom:6px;">{{ g.name }}</h3>
+      <p class="muted">{{ g.description or 'No description' }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card mb" style="text-align:center;padding:40px;">
+  <p class="muted">You haven't joined any groups yet.</p>
+  <a href="{{ url_for('create_group') }}" class="btn btn-primary" style="margin-top:16px;">Create your first group</a>
+</div>
+{% endif %}
+
+<h2 class="mb" style="font-size:1.1rem;color:var(--muted);">ALL GROUPS</h2>
+<div class="grid-3">
+  {% for g in all_groups %}
+  <a href="{{ url_for('group_detail', group_id=g.id) }}" style="color:inherit;">
+    <div class="card">
+      <div class="flex jc-sb" style="margin-bottom:10px;">
+        <span class="badge">{{ g.subject }}</span>
+        <span class="muted">{{ g.member_count }} members</span>
+      </div>
+      <h3 style="margin-bottom:4px;">{{ g.name }}</h3>
+      <p class="muted">by {{ g.owner_name }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

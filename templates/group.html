@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ group.name }} — Study Sathi{% endblock %}
+{% block content %}
+<div class="flex jc-sb mb">
+  <div>
+    <span class="badge" style="margin-bottom:8px;">{{ group.subject }}</span>
+    <h1>{{ group.name }}</h1>
+    <p class="muted">{{ group.description or '' }}</p>
+  </div>
+  {% if not is_member %}
+  <a href="{{ url_for('join_group', group_id=group.id) }}" class="btn btn-success">Join Group</a>
+  {% endif %}
+</div>
+
+<div class="grid-2">
+  <div>
+    <h2 class="mb" style="font-size:1rem;color:var(--muted);">MEMBERS ({{ members|length }})</h2>
+    <div class="card">
+      {% for m in members %}
+      <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;">{{ m.name[0] }}</div>
+        <div><div style="font-size:0.9rem;">{{ m.name }}</div><div class="muted">{{ m.email }}</div></div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div>
+    <h2 class="mb" style="font-size:1rem;color:var(--muted);">STUDY NOTES</h2>
+    {% if is_member %}
+    <div class="card mb">
+      <form method="POST" action="{{ url_for('upload_note', group_id=group.id) }}" enctype="multipart/form-data">
+        <label>Upload a note (PDF, image, doc)</label>
+        <div style="display:flex;gap:10px;margin-top:8px;">
+          <input type="file" name="file" accept=".pdf,.doc,.docx,.png,.jpg" style="flex:1;">
+          <button class="btn btn-primary btn-sm">Upload</button>
+        </div>
+      </form>
+    </div>
+    {% endif %}
+    <div class="card">
+      {% if notes %}
+        {% for n in notes %}
+        <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <a href="https://d2ct19a2czyq1f.cloudfront.net/{{ n.filename }}" target="_blank" style="color:var(--accent2);font-size:0.9rem;">
+              📄 {{ n.original_name }}
+            </a>
+            <div style="display:flex;gap:8px;">
+              <a href="https://d2ct19a2czyq1f.cloudfront.net/{{ n.filename }}" download style="color:var(--accent);font-size:0.8rem;">⬇ Download</a>
+              {% if n.user_id == session.user_id %}
+              <a href="{{ url_for('delete_note', group_id=group.id, note_id=n.id) }}" style="color:var(--danger);font-size:0.8rem;" onclick="return confirm('Delete this note?')">🗑 Delete</a>
+              {% endif %}
+            </div>
+          </div>
+          <div class="muted">by {{ n.uploader }} · {{ n.uploaded_at[:10] }}</div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="muted" style="text-align:center;padding:20px;">No notes yet. Be the first to upload!</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

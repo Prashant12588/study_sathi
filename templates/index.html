@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Study Sathi — Group Study Platform{% endblock %}
+{% block content %}
+<div style="text-align:center;padding:80px 20px 60px;">
+  <div style="display:inline-block;background:#6c63ff22;border:1px solid #6c63ff44;border-radius:20px;padding:6px 16px;font-size:0.8rem;color:var(--accent);margin-bottom:20px;">Built on AWS</div>
+  <h1 style="font-size:3rem;line-height:1.2;margin-bottom:16px;">Study together,<br><span style="color:var(--accent);">grow together</span></h1>
+  <p style="color:var(--muted);font-size:1.1rem;max-width:480px;margin:0 auto 36px;">Create study groups, share notes, and collaborate with classmates — all in one place.</p>
+  <div style="display:flex;gap:12px;justify-content:center;">
+    <a href="{{ url_for('signup') }}" class="btn btn-primary" style="padding:12px 28px;font-size:1rem;">Get Started</a>
+    <a href="{{ url_for('login') }}" class="btn btn-outline" style="padding:12px 28px;font-size:1rem;">Login</a>
+  </div>
+</div>
+<div class="grid-3 mt">
+  <div class="card"><h3 style="margin-bottom:8px;">📚 Study Groups</h3><p class="muted">Create or join groups by subject. Collaborate with your batch.</p></div>
+  <div class="card"><h3 style="margin-bottom:8px;">📁 Share Notes</h3><p class="muted">Upload PDFs and notes. Stored securely on AWS S3 with CloudFront CDN.</p></div>
+  <div class="card"><h3 style="margin-bottom:8px;">👥 Team Learning</h3><p class="muted">See who's in your group, track sessions, and stay motivated together.</p></div>
+</div>
+{% endblock %}

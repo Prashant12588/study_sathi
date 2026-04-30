@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Search — Study Sathi{% endblock %}
+{% block content %}
+<h2 class="mb">Search results for "{{ query }}"</h2>
+{% if groups %}
+<div class="grid-3">
+  {% for g in groups %}
+  <a href="{{ url_for('group_detail', group_id=g.id) }}" style="color:inherit;">
+    <div class="card">
+      <div class="flex jc-sb" style="margin-bottom:10px;">
+        <span class="badge">{{ g.subject }}</span>
+        <span class="muted">{{ g.member_count }} members</span>
+      </div>
+      <h3 style="margin-bottom:4px;">{{ g.name }}</h3>
+      <p class="muted">by {{ g.owner_name }}</p>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:40px;">
+  <p class="muted">No groups found for "{{ query }}"</p>
+  <a href="{{ url_for('create_group') }}" class="btn btn-primary" style="margin-top:16px;">Create this group</a>
+</div>
+{% endif %}
+{% endblock %}
