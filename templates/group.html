@@ -7,21 +7,52 @@
     <h1>{{ group.name }}</h1>
     <p class="muted">{{ group.description or '' }}</p>
   </div>
-  {% if not is_member %}
-  <a href="{{ url_for('join_group', group_id=group.id) }}" class="btn btn-success">Join Group</a>
-  {% endif %}
+  <div style="display:flex;gap:10px;">
+    {% if not is_member %}
+    <a href="{{ url_for('join_group', group_id=group.id) }}" class="btn btn-success">Join Group</a>
+    {% endif %}
+    {% if group.owner_id == session.user_id %}
+    <a href="{{ url_for('delete_group', group_id=group.id) }}" class="btn btn-outline" style="color:var(--danger);border-color:var(--danger);" onclick="return confirm('Delete this group? This cannot be undone!')">🗑 Delete Group</a>
+    {% endif %}
+  </div>
 </div>
 
 <div class="grid-2">
   <div>
     <h2 class="mb" style="font-size:1rem;color:var(--muted);">MEMBERS ({{ members|length }})</h2>
-    <div class="card">
+    <div class="card mb">
       {% for m in members %}
       <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
         <div style="width:34px;height:34px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.9rem;">{{ m.name[0] }}</div>
         <div><div style="font-size:0.9rem;">{{ m.name }}</div><div class="muted">{{ m.email }}</div></div>
       </div>
       {% endfor %}
+    </div>
+
+    <h2 class="mb" style="font-size:1rem;color:var(--muted);">GROUP CHAT</h2>
+    <div class="card">
+      <div style="height:300px;overflow-y:auto;margin-bottom:12px;" id="chat-box">
+        {% if messages %}
+          {% for msg in messages %}
+          <div style="padding:8px 0;border-bottom:1px solid var(--border);">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <div style="width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;">{{ msg.sender[0] }}</div>
+              <span style="font-size:0.85rem;font-weight:600;">{{ msg.sender }}</span>
+              <span class="muted" style="font-size:0.75rem;">{{ msg.sent_at[11:16] }}</span>
+            </div>
+            <p style="font-size:0.9rem;padding-left:32px;">{{ msg.message }}</p>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="muted" style="text-align:center;padding:20px;">No messages yet. Start the conversation!</p>
+        {% endif %}
+      </div>
+      {% if is_member %}
+      <form method="POST" action="{{ url_for('send_message', group_id=group.id) }}" style="display:flex;gap:8px;">
+        <input name="message" placeholder="Type a message..." style="flex:1;" required>
+        <button class="btn btn-primary btn-sm">Send</button>
+      </form>
+      {% endif %}
     </div>
   </div>
 
@@ -62,4 +93,9 @@
     </div>
   </div>
 </div>
+
+<script>
+  var chatBox = document.getElementById('chat-box');
+  if(chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+</script>
 {% endblock %}

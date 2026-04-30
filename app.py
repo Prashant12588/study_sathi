@@ -45,6 +45,13 @@ def init_db():
             original_name TEXT NOT NULL,
             uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP
         );
+CREATE TABLE IF NOT EXISTS messages (
+    id TEXT PRIMARY KEY,
+    group_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    message TEXT NOT NULL,
+    sent_at TEXT DEFAULT CURRENT_TIMESTAMP
+);
     ''')
     conn.commit()
     conn.close()
@@ -147,11 +154,11 @@ def group_detail(group_id):
         WHERE n.group_id = ?
         ORDER BY n.uploaded_at DESC
     ''', (group_id,)).fetchall()
+    messages = conn.execute('''SELECT m.*, u.name as sender FROM messages m JOIN users u ON m.user_id = u.id WHERE m.group_id = ? ORDER BY m.sent_at ASC''', (group_id,)).fetchall()
     is_member = conn.execute('SELECT 1 FROM memberships WHERE user_id=? AND group_id=?',
         (session['user_id'], group_id)).fetchone()
     conn.close()
-    return render_template('group.html', group=group, members=members, notes=notes, is_member=is_member)
-
+    return render_template('group.html', group=group, members=members, notes=notes, is_member=is_member, messages=messages)
 @app.route('/group/<group_id>/join')
 def join_group(group_id):
     if 'user_id' not in session:
@@ -221,6 +228,36 @@ def search():
     ''', (f'%{query}%', f'%{query}%')).fetchall()
     conn.close()
     return render_template('search.html', groups=groups, query=query)
+@app.route('/group/<group_id>/delete')
+def delete_group(group_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    conn = get_db()
+    group = conn.execute('SELECT * FROM groups WHERE id = ? AND owner_id = ?',
+        (group_id, session['user_id'])).fetchone()
+    if group:
+        conn.execute('DELETE FROM notes WHERE group_id = ?', (group_id,))
+        conn.execute('DELETE FROM memberships WHERE group_id = ?', (group_id,))
+        conn.execute('DELETE FROM groups WHERE id = ?', (group_id,))
+        conn.commit()
+        flash('Group deleted!', 'success')
+    else:
+        flash('You are not the owner!', 'error')
+    conn.close()
+    return redirect(url_for('dashboard'))
+
+@app.route('/group/<group_id>/chat', methods=['POST'])
+def send_message(group_id):
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    message = request.form.get('message', '').strip()
+    if message:
+        conn = get_db()
+        conn.execute('INSERT INTO messages (id, group_id, user_id, message) VALUES (?,?,?,?)',
+            (str(uuid.uuid4()), group_id, session['user_id'], message))
+        conn.commit()
+        conn.close()
+    return redirect(url_for('group_detail', group_id=group_id))
 if __name__ == '__main__':
     init_db()
     app.run(debug=True, host='0.0.0.0', port=5000)
