@@ -1,44 +1,111 @@
-# Study Sathi — Group Study Web App
+# 📚 Study Sathi
 
-A Flask web application for group study collaboration, deployed on AWS.
+**Study Sathi** is a collaborative group-study web platform that lets students create and join subject-based study groups, share notes, and learn together. Built with Flask and designed for simplicity, speed, and ease of deployment.
 
-## Tech Stack
-- **Backend**: Python Flask
-- **Database**: SQLite (local) → AWS RDS (production)
-- **Storage**: Local uploads → AWS S3 + CloudFront
-- **Hosting**: AWS EC2
+🔗 **Live Demo:** _[add your Railway/production URL here]_
 
-## Run Locally
+---
+
+## ✨ Features
+
+- 🔐 **User Authentication** — Secure signup/login with hashed passwords (Werkzeug security)
+- 👥 **Study Groups** — Create subject-specific groups with descriptions
+- 🤝 **Join & Collaborate** — Browse and join groups created by other students
+- 📄 **Note Sharing** — Upload and share study notes within a group
+- 📊 **Dashboard** — View your groups and discover new ones with live member counts
+- 💬 **Flash Messaging** — Clear user feedback for every action (success/error/info)
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer          | Technology                        |
+|----------------|------------------------------------|
+| Backend        | Python, Flask                      |
+| Database       | SQLite                             |
+| Auth           | Werkzeug (password hashing)        |
+| Frontend       | HTML, Jinja2 Templates             |
+| File Handling  | Flask file uploads                 |
+| Deployment     | Railway (Docker-ready)             |
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Python 3.9+
+- pip
+
+### Installation
+
 ```bash
-pip install flask werkzeug
+# Clone the repository
+git clone https://github.com/Prashant12588/study-sathi.git
+cd study-sathi
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Create the uploads folder (required for note uploads)
+mkdir uploads
+
+# Run the app
 python app.py
 ```
-Open http://localhost:5000
 
-## Project Structure
+The app will be available at `http://localhost:5000`
+
+---
+
+## 📁 Project Structure
+
 ```
-study_sathi/
-├── app.py              # Flask app + all routes
-├── requirements.txt
-├── templates/
-│   ├── base.html       # Shared layout + navbar
-│   ├── index.html      # Landing page
-│   ├── login.html      # Login page
-│   ├── signup.html     # Signup page
-│   ├── dashboard.html  # User dashboard
+study-sathi/
+├── app.py              # Main Flask application
+├── study_sathi.db      # SQLite database (auto-created on first run)
+├── uploads/            # Uploaded notes storage
+├── templates/          # HTML templates (Jinja2)
+│   ├── index.html
+│   ├── signup.html
+│   ├── login.html
+│   ├── dashboard.html
 │   ├── create_group.html
-│   └── group.html      # Group detail + upload
-└── uploads/            # Local file storage (→ S3 later)
+│   └── group.html
+└── README.md
 ```
 
-## Features
-- User signup / login / logout
-- Create and join study groups
-- Upload study notes (PDF, images, docs)
-- View group members and uploaded files
+---
 
-## Next Steps (AWS Integration)
-- Phase 2: Replace local uploads with S3 + CloudFront
-- Phase 3: Lambda for image resize / email notifications
-- Phase 4: Cognito for auth, SES for emails
-- Phase 5: CloudWatch monitoring, CodePipeline CI/CD
+## 🗄️ Database Schema
+
+- **users** — id, name, email, password (hashed), created_at
+- **groups** — id, name, subject, description, owner_id, created_at
+- **memberships** — user_id, group_id (many-to-many join table)
+- **notes** — id, group_id, user_id, filename, original_name, uploaded_at
+
+---
+
+## 🔮 Roadmap / Future Improvements
+
+- [ ] Migrate to PostgreSQL for persistent, production-grade storage
+- [ ] Add real-time group chat
+- [ ] File preview support for uploaded notes
+- [ ] Group admin controls (remove members, edit group details)
+- [ ] Email verification on signup
+
+---
+
+## 👤 Author
+
+**Prashant Yadav**
+B.Tech CSE (Cloud Computing & DevOps) — Uttaranchal University
+
+- GitHub: [@Prashant12588](https://github.com/Prashant12588)
+- LinkedIn: [Prashant Yadav](https://linkedin.com/in/prashant-yadav-343852204)
+- Email: yadavprashant7979@gmail.com
+
+---
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
