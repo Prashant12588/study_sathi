@@ -2,7 +2,7 @@
 
 **Study Sathi** is a collaborative group-study web platform that lets students create and join subject-based study groups, share notes, and learn together. Built with Flask and designed for simplicity, speed, and ease of deployment.
 
-🔗 **Live Demo:** _[add your Railway/production URL here]_
+🔗 **Live Demo:** https://studysathi-production.up.railway.app
 
 ---
 
